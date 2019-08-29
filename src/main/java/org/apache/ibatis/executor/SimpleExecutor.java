@@ -58,8 +58,11 @@ public class SimpleExecutor extends BaseExecutor {
     Statement stmt = null;
     try {
       Configuration configuration = ms.getConfiguration();
+      //5. 根据既有的参数，创建StatementHandler对象来执行查询操作，同时执行拦截器
       StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);
+      //6. 创建java.Sql.Statement对象，传递给StatementHandler对象
       stmt = prepareStatement(handler, ms.getStatementLog());
+      //7. 调用StatementHandler.query()方法，返回List结果集
       return handler.query(stmt, resultHandler);
     } finally {
       closeStatement(stmt);
@@ -82,8 +85,11 @@ public class SimpleExecutor extends BaseExecutor {
 
   private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
     Statement stmt;
+    //获取连接，如果日志级别是debug，创建ConnectLogger对象来代理实际的Connection对象
     Connection connection = getConnection(statementLog);
+    //创建Statement，同时setStatementTimeout，setFetchSize
     stmt = handler.prepare(connection, transaction.getTimeout());
+    //通过参数映射getParameterMappings，获取对应的类型处理器TypeHandler，对statement对象的?占位符处进行赋值
     handler.parameterize(stmt);
     return stmt;
   }

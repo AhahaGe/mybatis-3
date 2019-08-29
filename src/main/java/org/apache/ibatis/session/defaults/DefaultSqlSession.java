@@ -140,10 +140,34 @@ public class DefaultSqlSession implements SqlSession {
     return this.selectList(statement, parameter, RowBounds.DEFAULT);
   }
 
+  /**
+   * 1. 根据StatementId在mybatis配置对象Configuration中查询对应MappedStatement
+   * 2. 调用executor的查询方法查询结果
+   *  2.1 根据传入的参数动态生成需要执行的SQL语句，用BoundSQL对象表示。
+   *  2.2 为当前对象创建一个缓存Key
+   *  2.3 缓存中没有值，直接从数据库中读取数据
+   *  2.4 执行查询，返回结果
+   *    2.4.1 根据既有的参数，创建StatementHandler对象来执行查询操作，同时执行拦截器
+   *    2.4.2 创建java.Sql.Statement对象，传递给StatementHandler对象
+   *      2.4.2.1 获取连接，如果日志级别是debug，创建ConnectLogger对象来代理实际的Connection对象
+   *      2.4.2.2 创建Statement，同时setStatementTimeout，setFetchSize
+   *      2.4.2.3 通过参数映射getParameterMappings，获取对应的类型处理器TypeHandler，对statement对象的?占位符处进行赋值
+   *    2.4.3 调用StatementHandler.query()方法，返回List结果集
+   *      2.4.3.1 执行sql语句
+   *      2.4.3.2 处理返回的结果集
+   *  2.5. 结果放入缓存
+   * @param statement Unique identifier matching the statement to use.
+   * @param parameter A parameter object to pass to the statement.
+   * @param rowBounds  Bounds to limit object retrieval
+   * @param <E>
+   * @return
+   */
   @Override
   public <E> List<E> selectList(String statement, Object parameter, RowBounds rowBounds) {
     try {
+      // 1. 根据StatementId在mybatis配置对象中查询对应MappedStatement
       MappedStatement ms = configuration.getMappedStatement(statement);
+      // 2. 调用executor的查询方法查询结果
       return executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);
     } catch (Exception e) {
       throw ExceptionFactory.wrapException("Error querying database.  Cause: " + e, e);

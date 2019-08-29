@@ -26,6 +26,7 @@ import org.apache.ibatis.executor.BatchResult;
 /**
  * The primary Java interface for working with MyBatis.
  * Through this interface you can execute commands, get mappers and manage transactions.
+ * 使用Mybatis最主要的Java接口，通过这个接口可以执行命令，获取mappers以及管理事务。
  *
  * @author Clinton Begin
  */
@@ -58,9 +59,9 @@ public interface SqlSession extends Closeable {
 
   /**
    * Retrieve a list of mapped objects from the statement key and parameter.
-   * @param <E> the returned list element type
-   * @param statement Unique identifier matching the statement to use.
-   * @param parameter A parameter object to pass to the statement.
+   * @param <E> the returned list element type 返回列表的元素类型
+   * @param statement Unique identifier matching the statement to use. 语句的唯一标识符
+   * @param parameter A parameter object to pass to the statement. 传递给语句的参数对象
    * @return List of mapped object
    */
   <E> List<E> selectList(String statement, Object parameter);
