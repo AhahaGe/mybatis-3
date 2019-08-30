@@ -97,6 +97,8 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
  * Mybatis初始化的时候会将配置信息加载到内存中
+ *  1. 基于XML配置文件
+ *  2. 基于Java API方式
  * @author Clinton Begin
  */
 public class Configuration {
